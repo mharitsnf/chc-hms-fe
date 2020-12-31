@@ -25,3 +25,7 @@ a {
   bottom: 0;
   padding: 30px;
 }
+
+.container.main-content {
+  padding: 1.5rem;
+}

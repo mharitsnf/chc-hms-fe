@@ -1,7 +1,7 @@
 import "bulma/css/bulma.css"
-import AdminLayout from "../components/admin-layout";
+import AdminLayout from "../../components/admin-layout";
 
-const HomeLayout = () => {
+const AccommodationListLayout = () => {
     return (
         <div className="container main-content">
             <div className="columns">
@@ -9,20 +9,20 @@ const HomeLayout = () => {
                     <h1>Hello</h1>
                 </div>
                 <div className="column">
-                    <h1>This is my home page</h1>
+                    <h1>This is my accommodation list page</h1>
                 </div>
             </div>
         </div>
     )
 }
 
-const Home = () => {
+const AccommodationList = () => {
 
-    const content = <HomeLayout/>
+    const content = <AccommodationListLayout/>
 
     return (
-        <AdminLayout content={content} menu="home"/>
+        <AdminLayout content={content} menu="accommodation-list"/>
     )
 }
 
-export default Home
+export default AccommodationList
