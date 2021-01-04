@@ -1,13 +1,29 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import Router from "next/router";
 import "bulma/css/bulma.css"
+import axios from "axios";
 
 const AdminLayout = (props) => {
     const [isClosed, setIsClosed] = useState(true)
 
-    useEffect(() => {
-        console.log(props.menu)
+    useEffect(async () => {
+        try {
+            const token = localStorage.getItem('token')
+            const verifyRes = await axios.post(
+                `${process.env.NEXT_PUBLIC_BE_URL}/auth/verify`,
+                {
+                    token: token
+                }
+            )
+            if (verifyRes.status != 200) {
+                throw new Error('Not verified!')   
+            }
+        } catch (error) {
+            console.log(error)
+            Router.push('/login')
+        }
     })
 
     return (

@@ -1,4 +1,6 @@
+import axios from "axios";
 import "bulma/css/bulma.css"
+import Router from "next/router";
 import { useState } from "react";
 
 const LoginForm = () => {
@@ -6,17 +8,28 @@ const LoginForm = () => {
     const [password, setPassword] = useState('')
     const [isLoading, setIsLoading] = useState(false)
 
-    const handleSubmit = (event) => {
-        event.preventDefault()
-
-        alert(`${username} ${password}`)
+    const handleSubmit = async (event) => {
+        try {
+            event.preventDefault()
+            const loginRes = await axios.post(
+                `${process.env.NEXT_PUBLIC_BE_URL}/auth/token`,
+                {
+                    username: username,
+                    password: password
+                }
+            )
+            localStorage.setItem('token', loginRes.data.data.token)
+            Router.push('/')
+        } catch (error) {
+            
+        }
     }
 
     return (
         <div className="box">
             <div className="container is-fluid">
                 <div className="block">
-                    <p className="is-size-3 has-text-centered">Welcome</p>
+                    <p className="is-size-3 has-text-centered">{process.env.NEXT_PUBLIC_HELLO}</p>
                 </div>
                 <div className="columns is-centered">
                     <div className="column">
