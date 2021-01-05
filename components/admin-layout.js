@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Router from "next/router";
@@ -8,28 +8,10 @@ import axios from "axios";
 const AdminLayout = (props) => {
     const [isClosed, setIsClosed] = useState(true)
 
-    useEffect(async () => {
-        try {
-            const token = localStorage.getItem('token')
-            const verifyRes = await axios.post(
-                `${process.env.NEXT_PUBLIC_BE_URL}/auth/verify`,
-                {
-                    token: token
-                }
-            )
-            if (verifyRes.status != 200) {
-                throw new Error('Not verified!')   
-            }
-        } catch (error) {
-            console.log(error)
-            Router.push('/login')
-        }
-    })
-
     return (
         <div>
             <div className="container">
-                <nav className="navbar is-hidden-desktop" role="navigation" aria-label="main navigation">
+                <nav className="navbar" role="navigation" aria-label="main navigation">
                     <div className="navbar-brand">
                         <Link href="/">
                             <a className="navbar-item">
@@ -46,7 +28,7 @@ const AdminLayout = (props) => {
 
                     <div className={`navbar-menu ${isClosed ? '' : 'is-active'}`}>
                         <div className="navbar-start">
-                            <div className="navbar-item has-dropdown is-hoverable">
+                            <div className="navbar-item has-dropdown is-hoverable is-hidden-desktop">
                                 <a className="navbar-link">
                                     General
                                 </a>
@@ -58,24 +40,29 @@ const AdminLayout = (props) => {
                                     </Link>
                                 </div>
                             </div>
-                            <div className="navbar-item has-dropdown is-hoverable">
+                            <div className="navbar-item has-dropdown is-hoverable is-hidden-desktop">
                                 <a className="navbar-link">
                                     Accommodation
                                 </a>
                                 <div className="navbar-dropdown">
+                                    <Link href="/accommodation/check-in">
+                                        <a className="navbar-item">
+                                            Check-In
+                                        </a>
+                                    </Link>
+                                    <Link href="/accommodation/check-out">
+                                        <a className="navbar-item">
+                                            Check-Out
+                                        </a>
+                                    </Link>
                                     <Link href="/accommodation/accommodation-list">
                                         <a className="navbar-item">
                                             Accommodation List
                                         </a>
                                     </Link>
-                                    <Link href="/accommodation/accommodation-history">
-                                        <a className="navbar-item">
-                                            Accommodation History
-                                        </a>
-                                    </Link>
                                 </div>
                             </div>
-                            <div className="navbar-item has-dropdown is-hoverable">
+                            <div className="navbar-item has-dropdown is-hoverable is-hidden-desktop">
                                 <a className="navbar-link">
                                     Customer
                                 </a>
@@ -87,7 +74,7 @@ const AdminLayout = (props) => {
                                     </Link>
                                 </div>
                             </div>
-                            <div className="navbar-item has-dropdown is-hoverable">
+                            <div className="navbar-item has-dropdown is-hoverable is-hidden-desktop">
                                 <a className="navbar-link">
                                     Administration
                                 </a>
@@ -120,8 +107,9 @@ const AdminLayout = (props) => {
                                 Accommodation
                             </p>
                             <ul className="menu-list">
+                                <li><Link href="/accommodation/check-in"><a className={props.menu === 'check-in' ? 'is-active' : ''}>Check-In</a></Link></li>
+                                <li><Link href="/accommodation/check-out"><a className={props.menu === 'check-out' ? 'is-active' : ''}>Check-Out</a></Link></li>
                                 <li><Link href="/accommodation/accommodation-list"><a className={props.menu === 'accommodation-list' ? 'is-active' : ''}>Accommodation List</a></Link></li>
-                                <li><Link href="/accommodation/accommodation-history"><a className={props.menu === 'accommodation-history' ? 'is-active' : ''}>Accommodation History</a></Link></li>
                             </ul>
                             {/* Customer section */}
                             <p className="menu-label">

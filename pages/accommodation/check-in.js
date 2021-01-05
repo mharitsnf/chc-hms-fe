@@ -1,30 +1,28 @@
-import axios from "axios";
-import "bulma/css/bulma.css"
-import AdminLayout from "../components/admin-layout";
 import Cookie from "cookie";
+import axios from "axios";
+import AdminLayout from "../../components/admin-layout";
 
-const HomeLayout = ({ cookie }) => {
+const CheckInLayout = ({ cookie }) => {
     return (
         <div className="container main-content">
             <section className="hero">
                 <div className="hero-body">
-                    <h1 className="title">Overview</h1>
+                    <h1 className="title">Check-In</h1>
                 </div>
             </section>
         </div>
     )
 }
 
-const Home = ({ userCookie }) => {
-
-    const content = <HomeLayout cookie={userCookie}/>
+const CheckIn = ({ userCookie }) => {
+    const content = <CheckInLayout cookie={userCookie} />
 
     return (
-        <AdminLayout content={content} menu="home"/>
+        <AdminLayout content={content} menu="check-in" />
     )
 }
 
-export default Home
+export default CheckIn
 
 export const getServerSideProps = async (ctx) => {
     try {
@@ -42,6 +40,7 @@ export const getServerSideProps = async (ctx) => {
         }
         return { props: { userCookie: user } }
     } catch (error) {
+        console.log(error)
         ctx.res.writeHead(302, { Location: '/login' })
         ctx.res.end()
         return { props: {} }

@@ -2,11 +2,13 @@ import axios from "axios";
 import "bulma/css/bulma.css"
 import Router from "next/router";
 import { useState } from "react";
+import { useCookies } from "react-cookie";
+import Cookie from "cookie"
 
 const LoginForm = () => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const [isLoading, setIsLoading] = useState(false)
+    const [cookie, setCookie] = useCookies(['user'])
 
     const handleSubmit = async (event) => {
         try {
@@ -18,10 +20,26 @@ const LoginForm = () => {
                     password: password
                 }
             )
-            localStorage.setItem('token', loginRes.data.data.token)
+            const verifyRes = await axios.post(
+                `${process.env.NEXT_PUBLIC_BE_URL}/auth/verify`,
+                {
+                    token: loginRes.data.data.token
+                }
+            )
+
+            setCookie('user', JSON.stringify({
+                token: loginRes.data.data.token,
+                fullname: verifyRes.data.data.fullname,
+                _id: verifyRes.data.data._id
+            }), {
+                path: '/',
+                maxAge: 86400,
+                sameSite: true
+            })
+
             Router.push('/')
         } catch (error) {
-            
+            alert(error)
         }
     }
 
@@ -29,7 +47,7 @@ const LoginForm = () => {
         <div className="box">
             <div className="container is-fluid">
                 <div className="block">
-                    <p className="is-size-3 has-text-centered">{process.env.NEXT_PUBLIC_HELLO}</p>
+                    <p className="is-size-3 has-text-centered">Welcome</p>
                 </div>
                 <div className="columns is-centered">
                     <div className="column">
@@ -77,3 +95,18 @@ const Login = () => {
 }
 
 export default Login
+
+export const getServerSideProps = async (ctx) => {
+    try {
+        const cookie = Cookie.parse(ctx.req.headers.cookie)
+        if (cookie.user != undefined) {
+            throw new Error('User has logged in')
+        } else {
+            return { props: {} }
+        }
+    } catch (error) {
+        ctx.res.writeHead(302, { Location: '/' })
+        ctx.res.end()
+        return { props: {} }
+    }
+}

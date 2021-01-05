@@ -1,6 +1,13 @@
+import Image from "next/image";
 
 const Loader = (props) => {
-    return <div className={`pageloader ${props.isActive? 'is-active' : ''}`}><span className="title">Pageloader</span></div>
+    return (
+        <section className="hero is-fullheight">
+            <div className="hero-body is-justify-content-center">
+                <Image src="/loader.gif" width="128" height="128" />
+            </div>
+        </section>
+    )
 }
 
 export default Loader
