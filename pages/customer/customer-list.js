@@ -2,9 +2,20 @@ import { userValidation } from "../../globals/page-functions"
 import AdminLayout from "../../components/admin-layout"
 import { Grid, _ } from "gridjs-react";
 import "gridjs/dist/theme/mermaid.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const CustomerListLayout = ({ cookie }) => {
+    const [selectedType, setSelectedType] = useState('FIT')
+
+    const changeCustomerType = async (event) => {
+        try {
+            setSelectedType(event.target.value)
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     return (
         <div className="container main-content">
             <section className="hero">
@@ -13,9 +24,22 @@ const CustomerListLayout = ({ cookie }) => {
                 </div>
             </section>
             <div className="container">
+                <div className="field is-horizontal">
+                    <div className="field-label is-normal">
+                        <label className="label">Customer type </label>
+                    </div>
+                    <div className="field-body">
+                        <div className="select">
+                            <select onChange={changeCustomerType}>
+                                <option value='FIT'>FIT</option>
+                                <option value='Group'>Group</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
                 <Grid
                     server={{
-                        url: `${process.env.NEXT_PUBLIC_BE_URL}/customers`,
+                        url: `${process.env.NEXT_PUBLIC_BE_URL}/customers?customerType=${selectedType}`,
                         headers: { authorization: `Bearer ${cookie.token}` },
                         then: data => data.data.map(customer => [
                             customer.customerType,
@@ -25,13 +49,13 @@ const CustomerListLayout = ({ cookie }) => {
                             customer._id
                         ])
                     }}
-                    columns={[ 'Tipe Customer', {
+                    columns={['Tipe Customer', {
                         name: 'Nama',
                         formatter: cell => _(<a>{cell}</a>),
                         attributes: (cell, row, column) => {
                             return {
                                 onClick: () => {
-                                    
+
                                 }
                             }
                         }
