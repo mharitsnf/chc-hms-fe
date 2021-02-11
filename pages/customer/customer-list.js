@@ -5,16 +5,23 @@ import "gridjs/dist/theme/mermaid.css";
 import { useEffect, useState } from "react";
 
 const CustomerListLayout = ({ cookie }) => {
+    const [customer, setCustomer] = useState({})
+    const [detailsModal, setDetailsModal] = useState(false)
     const [selectedType, setSelectedType] = useState('FIT')
 
-    const changeCustomerType = async (event) => {
-        try {
-            setSelectedType(event.target.value)
-
-        } catch (error) {
-            console.log(error)
-        }
+    const openModal = (customerId) => {
+        setCustomer({ id: customerId})
+        setDetailsModal(true)
     }
+
+    const closeModal = () => {
+        setCustomer({})
+        setDetailsModal(false)
+    }
+
+    useEffect(() => {
+        console.log(customer)
+    }, [customer])
 
     return (
         <div className="container main-content">
@@ -23,6 +30,23 @@ const CustomerListLayout = ({ cookie }) => {
                     <h1 className="title">Customer List</h1>
                 </div>
             </section>
+
+            {/* Modal */}
+            <div className={`modal ${detailsModal ? 'is-active' : ''}`}>
+                <div className="modal-background"></div>
+                <div className="modal-card">
+                    <header className="modal-card-head">
+                        <p className="modal-card-title">Search Customer</p>
+                        <button className="delete" aria-label="close" onClick={closeModal}></button>
+                    </header>
+                    <section className="modal-card-body">
+                        <div className="container"></div>
+                    </section>
+                    <footer className="modal-card-foot"/>
+                </div>
+            </div>
+
+            {/* Content */}
             <div className="container">
                 <div className="field is-horizontal">
                     <div className="field-label is-normal">
@@ -30,7 +54,7 @@ const CustomerListLayout = ({ cookie }) => {
                     </div>
                     <div className="field-body">
                         <div className="select">
-                            <select onChange={changeCustomerType}>
+                            <select onChange={(event) => setSelectedType(event.target.value)}>
                                 <option value='FIT'>FIT</option>
                                 <option value='Group'>Group</option>
                             </select>
@@ -55,7 +79,7 @@ const CustomerListLayout = ({ cookie }) => {
                         attributes: (cell, row, column) => {
                             return {
                                 onClick: () => {
-
+                                    openModal(row.cells[4].data)
                                 }
                             }
                         }
