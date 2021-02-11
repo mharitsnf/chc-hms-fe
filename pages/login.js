@@ -43,6 +43,10 @@ const LoginForm = () => {
         }
     }
 
+    const Copyright = () => {
+        return <p className="has-text-centered has-text-weight-light is-size-7">Copyright Camp Hulu Cai</p>
+    }
+
     return (
         <div className="box">
             <div className="container is-fluid">
@@ -80,10 +84,6 @@ const LoginForm = () => {
     )
 }
 
-const Copyright = () => {
-    return <p className="has-text-centered has-text-weight-light is-size-7">Copyright Camp Hulu Cai</p>
-}
-
 const Login = () => {
     return (
         <section className="hero is-fullheight">
@@ -102,11 +102,11 @@ export const getServerSideProps = async (ctx) => {
         if (cookie.user != undefined) {
             throw new Error('User has logged in')
         } else {
-            return { props: {} }
+            return { props: { } }
         }
     } catch (error) {
         ctx.res.writeHead(302, { Location: '/' })
         ctx.res.end()
-        return { props: {} }
+        return { props: { } }
     }
 }

@@ -1,7 +1,6 @@
-import axios from "axios";
 import "bulma/css/bulma.css"
 import AdminLayout from "../components/admin-layout";
-import Cookie from "cookie";
+import { userValidation } from "../globals/page-functions"
 
 const HomeLayout = ({ cookie }) => {
     return (
@@ -20,30 +19,12 @@ const Home = ({ userCookie }) => {
     const content = <HomeLayout cookie={userCookie}/>
 
     return (
-        <AdminLayout content={content} menu="home"/>
+        <AdminLayout content={content} cookie={userCookie} menu="home"/>
     )
 }
 
 export default Home
 
 export const getServerSideProps = async (ctx) => {
-    try {
-        const cookie = Cookie.parse(ctx.req.headers.cookie)
-        const user = JSON.parse(cookie.user)
-
-        const verifyRes = await axios.post(
-            `${process.env.NEXT_PUBLIC_BE_URL}/auth/verify`,
-            {
-                token: user.token
-            }
-        )
-        if (verifyRes.status != 200) {
-            throw new Error('Not verified!')
-        }
-        return { props: { userCookie: user } }
-    } catch (error) {
-        ctx.res.writeHead(302, { Location: '/login' })
-        ctx.res.end()
-        return { props: {} }
-    }
+    return await userValidation(ctx)
 }

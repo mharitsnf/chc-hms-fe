@@ -3,10 +3,16 @@ import Link from "next/link";
 import Image from "next/image";
 import Router from "next/router";
 import "bulma/css/bulma.css"
-import axios from "axios";
+import Axios from "axios"
+import Cookie from "cookie"
 
 const AdminLayout = (props) => {
     const [isClosed, setIsClosed] = useState(true)
+
+
+    const handleLogout = async (event) => {
+
+    }
 
     return (
         <div>
@@ -85,6 +91,19 @@ const AdminLayout = (props) => {
                                         </a>
                                     </Link>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div className={`navbar-end`}>
+                        <div className={`navbar-item`}>
+                            <p>{props.cookie.fullname}</p>
+                        </div>
+                        <div className={`navbar-item`}>
+                            <div className={`buttons`}>
+                                <a className={`button is-light`} >
+                                    Log Out
+                                </a>
                             </div>
                         </div>
                     </div>
