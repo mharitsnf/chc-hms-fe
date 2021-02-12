@@ -1,27 +1,13 @@
 import { userValidation } from "../../globals/page-functions"
 import AdminLayout from "../../components/admin-layout"
+import EditCustomerModal from "../../components/add-customer-modal"
 import { Grid, _ } from "gridjs-react";
 import "gridjs/dist/theme/mermaid.css";
 import { useEffect, useState } from "react";
 
 const CustomerListLayout = ({ cookie }) => {
-    const [customer, setCustomer] = useState({})
-    const [detailsModal, setDetailsModal] = useState(false)
+    const [customerId, setCustomerId] = useState('')
     const [selectedType, setSelectedType] = useState('FIT')
-
-    const openModal = (customerId) => {
-        setCustomer({ id: customerId})
-        setDetailsModal(true)
-    }
-
-    const closeModal = () => {
-        setCustomer({})
-        setDetailsModal(false)
-    }
-
-    useEffect(() => {
-        console.log(customer)
-    }, [customer])
 
     return (
         <div className="container main-content">
@@ -31,20 +17,11 @@ const CustomerListLayout = ({ cookie }) => {
                 </div>
             </section>
 
-            {/* Modal */}
-            <div className={`modal ${detailsModal ? 'is-active' : ''}`}>
-                <div className="modal-background"></div>
-                <div className="modal-card">
-                    <header className="modal-card-head">
-                        <p className="modal-card-title">Search Customer</p>
-                        <button className="delete" aria-label="close" onClick={closeModal}></button>
-                    </header>
-                    <section className="modal-card-body">
-                        <div className="container"></div>
-                    </section>
-                    <footer className="modal-card-foot"/>
-                </div>
-            </div>
+            <EditCustomerModal
+                cookie={cookie}
+                customerId={customerId}
+                setCustomerId={setCustomerId}
+            />
 
             {/* Content */}
             <div className="container">
@@ -78,8 +55,9 @@ const CustomerListLayout = ({ cookie }) => {
                         formatter: cell => _(<a>{cell}</a>),
                         attributes: (cell, row, column) => {
                             return {
-                                onClick: () => {
-                                    openModal(row.cells[4].data)
+                                onClick: (event) => {
+                                    event.preventDefault()
+                                    setCustomerId(row.cells[4].data)
                                 }
                             }
                         }
