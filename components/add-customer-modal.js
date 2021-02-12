@@ -3,6 +3,8 @@ import CreatableSelect from "react-select/creatable"
 import axios from "axios"
 
 const EditCustomerModal = ({ cookie, customerId, setCustomerId }) => {
+    const [disabled, setDisabled] = useState(true)
+    const [hobbies, setHobbies] = useState([])
     const [hobby, setHobby] = useState('')
     const [customerData, setCustomerData] = useState(null)
 
@@ -12,28 +14,18 @@ const EditCustomerModal = ({ cookie, customerId, setCustomerId }) => {
     })
 
     const handleKeyDown = (event) => {
-        let tempCustomerData = customerData
         if (!hobby) return
         switch (event.key) {
             case 'Enter':
             case 'Tab':
-                tempCustomerData.picData.picHobbies = [ ...tempCustomerData.picData.picHobbies, createOption(hobby) ]
-
+                setHobbies([...hobbies, createOption(hobby)])
                 setHobby('')
-                setCustomerData(tempCustomerData)
-
                 event.preventDefault()
-                break
-        
-            default:
-                break;
         }
     }
 
     const handleChange = (value) => {
-        let tempCustomerData = customerData
-        tempCustomerData.picData.picHobbies = value
-        setCustomerData(tempCustomerData)
+        setHobbies(value)
     }
 
     useEffect(async () => {
@@ -48,12 +40,13 @@ const EditCustomerModal = ({ cookie, customerId, setCustomerId }) => {
                     }
                 )
 
-                searchRes.data.data.picData.picHobbies = searchRes.data.data.picData.picHobbies.map((hobby) => {
+                setHobbies(searchRes.data.data.picData.picHobbies.map((hobby) => {
                     return createOption(hobby)
-                })
-
+                }))
                 setCustomerData(searchRes.data.data)
+
             } else {
+                setHobbies([])
                 setCustomerData(null)
             }
         } catch (error) {
@@ -76,7 +69,7 @@ const EditCustomerModal = ({ cookie, customerId, setCustomerId }) => {
                 </header>
                 <section className="modal-card-body">
                     <div className="container">
-                        <fieldset disabled>
+                        <fieldset disabled={disabled}>
                             {/* Customer Type */}
                             <div className="field">
                                 <label className="label">Customer Type</label>
@@ -149,7 +142,7 @@ const EditCustomerModal = ({ cookie, customerId, setCustomerId }) => {
                                 </div>
                             </div>
 
-                            {/* Email */}
+                            {/* Address */}
                             <div className="field">
                                 <label className="label">Address</label>
                                 <div className="control">
@@ -166,25 +159,25 @@ const EditCustomerModal = ({ cookie, customerId, setCustomerId }) => {
                                 </div>
                             </div>
 
+                            {/* Hobbies list */}
                             <div className="field">
                                 <label className="label">Hobbies</label>
                                 <div className="control">
                                     <CreatableSelect
-                                        // isDisabled
+                                        isDisabled={disabled}
+                                        isClearable
+                                        isMulti
                                         components={{ DropdownIndicator: null }}
                                         inputValue={hobby}
                                         onInputChange={(value) => setHobby(value)}
                                         onKeyDown={handleKeyDown}
                                         onChange={handleChange}
-                                        isClearable
-                                        isMulti
                                         menuIsOpen={false}
-                                        value={customerData ? customerData.picData.picHobbies : []}
+                                        value={hobbies}
                                         placeholder="Write hobby..."
                                     />
                                 </div>
                             </div>
-
                         </fieldset>
                     </div>
                 </section>
