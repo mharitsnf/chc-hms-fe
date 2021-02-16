@@ -5,15 +5,11 @@ import Router from "next/router";
 import "bulma/css/bulma.css"
 import Axios from "axios"
 import Cookie from "cookie"
+import Loader from "./loader"
 
 const AdminLayout = (props) => {
     const [isClosed, setIsClosed] = useState(true)
-
-
-    const handleLogout = async (event) => {
-
-    }
-
+    
     return (
         <div>
             <div className="container">

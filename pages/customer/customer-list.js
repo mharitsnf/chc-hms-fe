@@ -3,7 +3,8 @@ import AdminLayout from "../../components/admin-layout"
 import EditCustomerModal from "../../components/add-customer-modal"
 import { Grid, _ } from "gridjs-react";
 import "gridjs/dist/theme/mermaid.css";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import Router from "next/router";
 
 const CustomerListLayout = ({ cookie }) => {
     const [customerId, setCustomerId] = useState('')
@@ -24,51 +25,49 @@ const CustomerListLayout = ({ cookie }) => {
             />
 
             {/* Content */}
-            <div className="container">
-                <div className="field is-horizontal">
-                    <div className="field-label is-normal">
-                        <label className="label">Customer type </label>
-                    </div>
-                    <div className="field-body">
-                        <div className="select">
-                            <select onChange={(event) => setSelectedType(event.target.value)}>
-                                <option value='FIT'>FIT</option>
-                                <option value='Group'>Group</option>
-                            </select>
-                        </div>
+            <div className="field is-horizontal">
+                <div className="field-label is-normal">
+                    <label className="label">Customer type </label>
+                </div>
+                <div className="field-body">
+                    <div className="select">
+                        <select onChange={(event) => setSelectedType(event.target.value)}>
+                            <option value='FIT'>FIT</option>
+                            <option value='Group'>Group</option>
+                        </select>
                     </div>
                 </div>
-                <Grid
-                    server={{
-                        url: `${process.env.NEXT_PUBLIC_BE_URL}/customers?customerType=${selectedType}`,
-                        headers: { authorization: `Bearer ${cookie.token}` },
-                        then: data => data.data.map(customer => [
-                            customer.customerType,
-                            customer.picData.picName,
-                            customer.picData.picTelp,
-                            customer.picData.picEmail,
-                            customer._id
-                        ])
-                    }}
-                    columns={['Tipe Customer', {
-                        name: 'Nama',
-                        formatter: cell => _(<a>{cell}</a>),
-                        attributes: (cell, row, column) => {
-                            return {
-                                onClick: (event) => {
-                                    event.preventDefault()
-                                    setCustomerId(row.cells[4].data)
-                                }
+            </div>
+            <Grid
+                server={{
+                    url: `${process.env.NEXT_PUBLIC_BE_URL}/customers?customerType=${selectedType}`,
+                    headers: { authorization: `Bearer ${cookie.token}` },
+                    then: data => data.data.map(customer => [
+                        customer.customerType,
+                        customer.picData.picName,
+                        customer.picData.picTelp,
+                        customer.picData.picEmail,
+                        customer._id
+                    ])
+                }}
+                columns={['Tipe Customer', {
+                    name: 'Nama',
+                    formatter: cell => _(<a>{cell}</a>),
+                    attributes: (cell, row, column) => {
+                        return {
+                            onClick: (event) => {
+                                event.preventDefault()
+                                Router.push(`/customer/${row.cells[4].data}`)
                             }
                         }
-                    }, 'No. Telepon', 'Email', { name: 'id', hidden: true }]}
-                    search={true}
-                    pagination={{
-                        enabled: true,
-                        limit: 15,
-                    }}
-                />
-            </div>
+                    }
+                }, 'No. Telepon', 'Email', { name: 'id', hidden: true }]}
+                search={true}
+                pagination={{
+                    enabled: true,
+                    limit: 15,
+                }}
+            />
         </div>
     )
 }
