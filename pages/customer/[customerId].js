@@ -2,17 +2,14 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { Grid, _ } from "gridjs-react";
-import CreatableSelect from "react-select/creatable"
 import "gridjs/dist/theme/mermaid.css";
+import CreatableSelect from "react-select/creatable"
 import { userValidation } from "../../globals/page-functions";
 import AdminLayout from "../../components/admin-layout";
-import Loader from "../../components/loader";
 import { Notification } from "../../components/notification"
 
 const CustomerLayout = ({ cookie }) => {
     const [isEdit, setIsEdit] = useState(false)
-    const [notificationData, setNotificationData] = useState({})
-    const [isNotificationHidden, setIsNotificationHidden] = useState(true)
 
     const [customerData, setCustomerData] = useState({})
 
@@ -31,8 +28,32 @@ const CustomerLayout = ({ cookie }) => {
 
     const [isModalHidden, setIsModalHidden] = useState(true)
 
+    const [isUpdateLoading, setIsUpdateLoading] = useState(false)
+
     const router = useRouter()
     const { customerId } = router.query
+
+    const Aux = (props) => {
+        return props.children
+    }
+
+    const resetState = data => {
+        setCustomerType(data.customerType)
+        setPicName(data.picData.picName)
+        setPicTelp(data.picData.picTelp)
+        setPicEmail(data.picData.picEmail)
+        setPicAddress(data.picData.picAddress)
+        setHobbies(data.picData.picHobbies.map((hobby) => {
+            return createOption(hobby)
+        }))
+
+        if (data.customerType == 'Group') {
+            setCompanyName(data.companyData.companyName)
+            setCompanyTelp(data.companyData.companyTelp)
+            setCompanyEmail(data.companyData.companyEmail)
+            setCompanyAddress(data.companyData.companyAddress)
+        }
+    }
 
     useEffect(async () => {
         try {
@@ -48,22 +69,7 @@ const CustomerLayout = ({ cookie }) => {
 
             const custData = getCustomerRes.data.data
             setCustomerData(custData)
-
-            setCustomerType(custData.customerType)
-            setPicName(custData.picData.picName)
-            setPicTelp(custData.picData.picTelp)
-            setPicEmail(custData.picData.picEmail)
-            setPicAddress(custData.picData.picAddress)
-            setHobbies(custData.picData.picHobbies.map((hobby) => {
-                return createOption(hobby)
-            }))
-
-            if (custData.customerType == 'Group') {
-                setCompanyName(custData.companyData.companyName)
-                setCompanyTelp(custData.companyData.companyTelp)
-                setCompanyEmail(custData.companyData.companyEmail)
-                setCompanyAddress(custData.companyData.companyAddress)
-            }
+            resetState(custData)
 
         } catch (error) {
             console.log(error)
@@ -79,23 +85,8 @@ const CustomerLayout = ({ cookie }) => {
         event.preventDefault()
 
         const newVal = !isEdit
-
         if (!newVal) {
-            setCustomerType(customerData.customerType)
-            setPicName(customerData.picData.picName)
-            setPicTelp(customerData.picData.picTelp)
-            setPicEmail(customerData.picData.picEmail)
-            setPicAddress(customerData.picData.picAddress)
-            setHobbies(customerData.picData.picHobbies.map((hobby) => {
-                return createOption(hobby)
-            }))
-
-            if (customerData.customerType == 'Group') {
-                setCompanyName(customerData.companyData.companyName)
-                setCompanyTelp(customerData.companyData.companyTelp)
-                setCompanyEmail(customerData.companyData.companyEmail)
-                setCompanyAddress(customerData.companyData.companyAddress)
-            }
+            resetState(customerData)
         }
 
         setIsEdit(newVal)
@@ -120,37 +111,26 @@ const CustomerLayout = ({ cookie }) => {
     const handleSubmitEdit = async (event) => {
         try {
             event.preventDefault()
+            setIsUpdateLoading(true)
 
-            let data
-            if (customerType == 'FIT') {
-                data = {
-                    picData: {
-                        picName: picName,
-                        picTelp: picTelp,
-                        picEmail: picEmail,
-                        picAddress: picAddress,
-                        picHobbies: hobbies.map(value => {
-                            return value.label
-                        })
-                    }
+            let data = {
+                picData: {
+                    picName: picName,
+                    picTelp: picTelp,
+                    picEmail: picEmail,
+                    picAddress: picAddress,
+                    picHobbies: hobbies.map(value => {
+                        return value.label
+                    })
                 }
-            } else {
-                data = {
-                    picData: {
-                        picName: picName,
-                        picTelp: picTelp,
-                        picEmail: picEmail,
-                        picAddress: picAddress,
-                        picHobbies: hobbies.map(value => {
-                            return value.label
-                        })
-                    },
-                    companyData: {
-                        companyName: companyName,
-                        companyTelp: companyTelp,
-                        companyEmail: companyEmail,
-                        companyAddress: companyAddress
-                    }
+            }
+
+            if (customerType == 'Group') {
+                data['companyData'] = {
+                    companyName: companyName,
+                    companyTelp: companyTelp,
+                    companyEmail: companyEmail,
+                    companyAddress: companyAddress
                 }
             }
 
@@ -163,15 +143,16 @@ const CustomerLayout = ({ cookie }) => {
             )
 
             if (updateResult.status != 200) {
-                throw new Error(updateResult)
+                throw new Error(updateResult.message)
             }
 
-            console.log("ok")
+            alert('Update successful!')
 
             router.reload()
 
+            setIsUpdateLoading(false)
         } catch (error) {
-            console.log(error)
+            alert(error)
             router.reload()
         }
     }
@@ -181,7 +162,7 @@ const CustomerLayout = ({ cookie }) => {
         const GroupReview = () => {
             if (customerType == 'Group') {
                 return (
-                    <div>
+                    <Aux>
                         <div className="field is-horizontal">
                             <div className="field-label">
                                 <label className="label">Company Name</label>
@@ -222,11 +203,27 @@ const CustomerLayout = ({ cookie }) => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </Aux>
                 )
             }
 
             return null
+        }
+
+        const ModalFooter = () => {
+            if (isUpdateLoading) {
+                return <progress className="progress is-small is-primary" max="100%" />
+            } else {
+                return (
+                    <Aux>
+                        <button className="button is-success" onClick={handleSubmitEdit}>Save changes</button>
+                        <button className="button" onClick={event => {
+                            handleEditButton(event)
+                            setIsModalHidden(true)
+                        }}>Cancel</button>
+                    </Aux>
+                )
+            }
         }
 
         return (
@@ -300,11 +297,7 @@ const CustomerLayout = ({ cookie }) => {
                         <GroupReview />
                     </section>
                     <footer className="modal-card-foot">
-                        <button className="button is-success" onClick={handleSubmitEdit}>Save changes</button>
-                        <button className="button" onClick={event => {
-                            handleEditButton(event)
-                            setIsModalHidden(true)
-                        }}>Cancel</button>
+                        <ModalFooter/>
                     </footer>
                 </div>
             </div>
@@ -334,9 +327,7 @@ const CustomerLayout = ({ cookie }) => {
     }
 
     const GroupDetailsAndForm = ({ customerType }) => {
-        if (customerType == 'FIT') {
-            return null
-        } else {
+        if (customerType == 'Group') {
             return (
                 <div className="column">
                     <div className="field is-horizontal">
@@ -345,7 +336,7 @@ const CustomerLayout = ({ cookie }) => {
                         </div>
                         <div className="field-body">
                             <div className="field">
-                                <input className="input" disabled={!isEdit} value={companyName} onChange={event => setCompanyName(event.target.value)} />
+                                <input className={`input ${isEdit ? '' : 'is-static'}`} readOnly={!isEdit} value={companyName} onChange={event => setCompanyName(event.target.value)} />
                             </div>
                         </div>
                     </div>
@@ -355,7 +346,7 @@ const CustomerLayout = ({ cookie }) => {
                         </div>
                         <div className="field-body">
                             <div className="field">
-                                <input className="input" disabled={!isEdit} value={companyTelp} onChange={event => setCompanyTelp(event.target.value)} />
+                                <input className={`input ${isEdit ? '' : 'is-static'}`} type="tel" readOnly={!isEdit} value={companyTelp} onChange={event => setCompanyTelp(event.target.value)} />
                             </div>
                         </div>
                     </div>
@@ -365,7 +356,7 @@ const CustomerLayout = ({ cookie }) => {
                         </div>
                         <div className="field-body">
                             <div className="field">
-                                <input className="input" disabled={!isEdit} value={companyEmail} onChange={event => setCompanyAddress(event.target.value)} />
+                                <input className={`input ${isEdit ? '' : 'is-static'}`} readOnly={!isEdit} value={companyEmail} onChange={event => setCompanyAddress(event.target.value)} />
                             </div>
                         </div>
                     </div>
@@ -375,17 +366,19 @@ const CustomerLayout = ({ cookie }) => {
                         </div>
                         <div className="field-body">
                             <div className="field">
-                                <input className="input" disabled={!isEdit} value={companyAddress} onChange={event => setCompanyAddress(event.target.value)} />
+                                <input className={`input ${isEdit ? '' : 'is-static'}`} readOnly={!isEdit} value={companyAddress} onChange={event => setCompanyAddress(event.target.value)} />
                             </div>
                         </div>
                     </div>
                 </div>
             )
         }
+
+        return null
     }
 
     return (
-        
+
         <div className="container main-content">
 
             <section className="hero">
@@ -417,7 +410,7 @@ const CustomerLayout = ({ cookie }) => {
                             <div className="field-body">
                                 <div className="field">
                                     <div className="control">
-                                        <input className="input" disabled={!isEdit} value={picName} onChange={event => setPicName(event.target.value)} />
+                                        <input className={`input ${isEdit ? '' : 'is-static'}`} readOnly={!isEdit} value={picName} onChange={event => setPicName(event.target.value)} />
                                     </div>
                                 </div>
                             </div>
@@ -429,7 +422,7 @@ const CustomerLayout = ({ cookie }) => {
                             <div className="field-body">
                                 <div className="field">
                                     <div className="control">
-                                        <input className="input" disabled={!isEdit} value={picTelp} onChange={event => setPicTelp(event.target.value)} />
+                                        <input className={`input ${isEdit ? '' : 'is-static'}`} type="tel" readOnly={!isEdit} value={picTelp} onChange={event => setPicTelp(event.target.value)} />
                                     </div>
                                 </div>
                             </div>
@@ -441,7 +434,7 @@ const CustomerLayout = ({ cookie }) => {
                             <div className="field-body">
                                 <div className="field">
                                     <div className="control">
-                                        <input className="input" disabled={!isEdit} value={picEmail} onChange={event => setPicEmail(event.target.value)} />
+                                        <input className={`input ${isEdit ? '' : 'is-static'}`} readOnly={!isEdit} value={picEmail} onChange={event => setPicEmail(event.target.value)} />
                                     </div>
                                 </div>
                             </div>
@@ -453,7 +446,7 @@ const CustomerLayout = ({ cookie }) => {
                             <div className="field-body">
                                 <div className="field">
                                     <div className="control">
-                                        <input className="input" disabled={!isEdit} value={picAddress} onChange={event => setPicAddress(event.target.value)} />
+                                        <input className={`input ${isEdit ? '' : 'is-static'}`} readOnly={!isEdit} value={picAddress} onChange={event => setPicAddress(event.target.value)} />
                                     </div>
                                 </div>
                             </div>

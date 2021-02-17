@@ -25,11 +25,9 @@ const CustomerListLayout = ({ cookie }) => {
             />
 
             {/* Content */}
-            <div className="field is-horizontal">
-                <div className="field-label is-normal">
-                    <label className="label">Customer type </label>
-                </div>
-                <div className="field-body">
+            <div className="field">
+                <label className="label">Customer type </label>
+                <div className="control">
                     <div className="select">
                         <select onChange={(event) => setSelectedType(event.target.value)}>
                             <option value='FIT'>FIT</option>

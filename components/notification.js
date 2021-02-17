@@ -1,9 +1,18 @@
+import ReactDOM from "react-dom";
+import { useRef } from "react";
 
-export const Notification = ({ data, isHidden, setIsHidden }) => {
+export const Notification = (props) => {
+
+    const component = useRef(null)
+
+    const handleDelete = () => {
+        ReactDOM.unmountComponentAtNode(component.current)
+    }
+
     return (
-        <div className={`notification ${data.type} ${isHidden ? 'is-hidden' : ''}`}>
-            <button className="delete" onClick={event => setIsHidden(true)}></button>
-            {data, content}
+        <div className="notification" ref={component}>
+            <button className="delete" onClick={handleDelete}></button>
+            {props.children}
         </div>
     )
 }
